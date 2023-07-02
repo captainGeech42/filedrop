@@ -1,0 +1,51 @@
+CREATE TABLE IF NOT EXISTS `migrations` (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    migration_number INTEGER NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS `users` (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    username TEXT UNIQUE NOT NULL,
+    password_hash BLOB,
+    salt BLOB,
+    enabled INTEGER DEFAULT TRUE,
+    is_anon INTEGER DEFAULT FALSE
+);
+
+CREATE TABLE IF NOT EXISTS `apikeys` (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    user INTEGER NOT NULL,
+    key TEXT NOT NULL,
+    deleted INTEGER DEFAULT FALSE,
+
+    FOREIGN KEY(user) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS `log` (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    action TEXT NOT NULL,
+    src_ip TEXT,
+    message TEXT
+);
+
+CREATE TABLE IF NOT EXISTS `files` (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    size INTEGER NOT NULL,
+    sha256 TEXT NOT NULL,
+    path TEXT NOT NULL,
+    user INTEGER NOT NULL,
+    expiration_time TIMESTAMP,
+    max_downloads INTEGER,
+
+    FOREIGN KEY(user) REFERENCES users(id)
+);
+
+---------
+
+INSERT INTO `migrations` (migration_number) VALUES (0);
+INSERT INTO `users` (username, is_anon) VALUES ("anonymous", TRUE);
