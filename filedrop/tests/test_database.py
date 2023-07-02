@@ -1,17 +1,17 @@
 import os
-import unittest
 
 import filedrop.lib.database as f_db
 import filedrop.lib.models as f_models
+import filedrop.tests.utils as f_tests
 
 
-class DatabaseTest(unittest.TestCase):
+class DatabaseTest(f_tests.FiledropTest):
     def test_migrations(self):
         num_migrations = len(
             list(filter(lambda x: x.endswith(".sql"), os.listdir(f_db.Database.get_migrations_folder())))
         )
 
-        with f_db.Database() as db:
+        with self.getTestDatabase() as db:
             self.assertTrue(db.migrated)
 
             with db.cursor() as c:
@@ -23,8 +23,10 @@ class DatabaseTest(unittest.TestCase):
                 self.assertEqual(x.fetchone()[0], 1)
 
     def test_users(self):
-        with f_db.Database() as db:
+        with self.getTestDatabase() as db:
             u = db.get_user("anonymous")
+            self.assertIsNotNone(u)
+            u = db.get_anon_user()
             self.assertIsNotNone(u)
 
             u = db.get_user("asdfasdf")
@@ -43,3 +45,6 @@ class DatabaseTest(unittest.TestCase):
 
             u3 = db.get_user("hello")
             self.assertNotEqual(u2, u3)
+
+            self.assertIsNotNone(db.get_user_id("anonymous"))
+            self.assertIsNone(db.get_user_id("zzxxxcvc"))

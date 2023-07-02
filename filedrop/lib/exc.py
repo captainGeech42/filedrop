@@ -13,3 +13,11 @@ class InvalidState(FiledropException):
 
 class MigrationFailure(FiledropException):
     """The database migrations failed to execute."""
+
+
+class BadArgs(FiledropException):
+    """The combination of arguments to the function are invalid."""
+
+
+class InvalidUser(FiledropException):
+    """The user is invalid."""

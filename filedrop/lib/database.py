@@ -2,12 +2,14 @@ import contextlib
 import logging
 import os
 import sqlite3
-import sys
 
+from filedrop import ROOT_DIR
 import filedrop.lib.exc as f_exc
 import filedrop.lib.models as f_models
 
 log = logging.getLogger(__name__)
+
+ANONYMOUS_USERNAME = "anonymous"
 
 
 class Database:
@@ -83,7 +85,7 @@ class Database:
     def get_migrations_folder(cls):
         """Root folder path containing the migration SQL scripts."""
 
-        return os.path.join(sys.path[1], "filedrop", "migrations")
+        return os.path.join(ROOT_DIR, "migrations")
 
     @contextlib.contextmanager
     def cursor(self):
@@ -104,7 +106,7 @@ class Database:
 
         with self.cursor() as c:
             x = c.execute(
-                "select password_hash, salt, enabled, is_anon from users where username = ?;",
+                "SELECT password_hash, salt, enabled, is_anon FROM users WHERE username = ?;",
                 (username,),
             )
             r = x.fetchone()
@@ -114,13 +116,28 @@ class Database:
 
             return None
 
+    def get_user_id(self, username: str) -> int | None:
+        """Get the ID for a user from the database. Returns the id if exists, otherwise None."""
+
+        with self.cursor() as c:
+            x = c.execute(
+                "SELECT id FROM users WHERE username = ?;",
+                (username,),
+            )
+            r = x.fetchone()
+
+            if r:
+                return r[0]
+
+            return None
+
     def add_user(self, user: f_models.User) -> bool:
         """Add a new user to the database. Returns False on failure or duplicate username, else True."""
 
         with self.cursor() as c:
             try:
                 x = c.execute(
-                    "insert into users (username, password_hash, salt, enabled) values (?, ?, ?, ?);",
+                    "INSERT INTO users (username, password_hash, salt, enabled) VALUES (?, ?, ?, ?);",
                     (user.username, user.password_hash, user.salt, user.enabled),
                 )
                 return x.rowcount == 1
@@ -133,7 +150,22 @@ class Database:
 
         with self.cursor() as c:
             x = c.execute(
-                "update users set password_hash = ? and salt = ? where username = ?;",
+                "UPDATE users SET password_hash = ? AND salt = ? WHERE username = ?;",
                 (user.password_hash, user.salt, user.username),
+            )
+            return x.rowcount == 1
+
+    def get_anon_user(self) -> f_models.User | None:
+        """Get the anonymous user."""
+
+        return self.get_user("anonymous")
+
+    def add_new_file(self, file: f_models.File) -> bool:
+        """Add a new file upload."""
+
+        with self.cursor() as c:
+            x = c.execute(
+                "INSERT INTO files (name, size, hash, path, user, expiration_time, max_downloads) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (file.name, file.size, file.hash, file.path, file.user_id, file.expiration_time, file.max_downloads),
             )
             return x.rowcount == 1

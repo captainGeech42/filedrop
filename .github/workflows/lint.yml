@@ -39,4 +39,4 @@ jobs:
       run: black --diff --check .
 
     - name: Run pylint
-      run: pylint filedrop
+      run: pylint -j 0 filedrop

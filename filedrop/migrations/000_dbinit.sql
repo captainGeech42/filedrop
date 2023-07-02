@@ -24,25 +24,31 @@ CREATE TABLE IF NOT EXISTS `apikeys` (
     FOREIGN KEY(user) REFERENCES users(id)
 );
 
-CREATE TABLE IF NOT EXISTS `log` (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    action TEXT NOT NULL,
-    src_ip TEXT,
-    message TEXT
-);
-
 CREATE TABLE IF NOT EXISTS `files` (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    name TEXT NOT NULL,
     size INTEGER NOT NULL,
-    sha256 TEXT NOT NULL,
+    hash TEXT NOT NULL,
     path TEXT NOT NULL,
     user INTEGER NOT NULL,
     expiration_time TIMESTAMP,
     max_downloads INTEGER,
 
     FOREIGN KEY(user) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS `log` (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    action TEXT NOT NULL,
+    user INTEGER,
+    file INTERGER,
+    src_ip TEXT,
+    message TEXT,
+
+    FOREIGN KEY(user) REFERENCES users(id)
+    FOREIGN KEY(file) REFERENCES files(id)
 );
 
 ---------

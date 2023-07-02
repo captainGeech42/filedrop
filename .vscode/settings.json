@@ -3,4 +3,11 @@
         "editor.formatOnSave": true,
     },
     "python.formatting.provider": "black",
+    "python.linting.mypyEnabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.linting.ignorePatterns": [
+        "filedrop/tests/**/test_*.py"
+    ],
+    "python.linting.enabled": true,
+    "python.linting.lintOnSave": true
 }

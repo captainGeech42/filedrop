@@ -1,21 +1,13 @@
 import hashlib
 import logging
 from dataclasses import dataclass
+from datetime import datetime
 
 from Crypto.Random import get_random_bytes
 
 import filedrop.lib.exc as f_exc
 
 log = logging.getLogger(__name__)
-
-
-@dataclass
-class File:
-    """A representation of a file upload from the database."""
-
-    name: str
-    path: str
-    size: int
 
 
 @dataclass
@@ -100,3 +92,22 @@ class User:
             and self.enabled == rhs.enabled
             and self.is_anon == rhs.is_anon
         )
+
+
+@dataclass
+class File:
+    """A representation of a file upload from the database."""
+
+    name: str
+    path: str
+    size: int
+    hash: str
+    user_id: int
+    expiration_time: datetime | None = None
+    max_downloads: int | None = None
+
+    def __repr__(self) -> str:
+        return f"<File {self.name} [{self.hash[:8]}...{self.hash[-8:]}, {self.size} bytes] - user {self.user_id}>"
+
+    def __str__(self) -> str:
+        return repr(self)

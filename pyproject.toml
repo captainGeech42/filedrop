@@ -11,6 +11,16 @@ check_untyped_defs = true
 [tool.pylint]
 disable = [
     "line-too-long",
-    "invalid-name",
-    "missing-module-docstring"
+    "missing-module-docstring",
+    "fixme",
+    "too-few-public-methods"
+]
+ignore = [
+    "filedrop/tests"
+]
+
+[tool.pylint.basic]
+# allow single letter variable names
+good-names-rgxs = [
+    "[a-z]{1}"
 ]
