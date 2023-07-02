@@ -39,14 +39,14 @@ class Database:
             raise f_exc.InvalidState("no database connection exists")
 
         with self.cursor() as c:
-            files = os.listdir(self.migrations_folder)
+            files = os.listdir(self.get_migrations_folder())
             files.sort()
 
             for f in files:
                 if not f.endswith(".sql"):
                     continue
 
-                p = os.path.join(self.migrations_folder, f)
+                p = os.path.join(self.get_migrations_folder(), f)
 
                 log.debug("executing migration script: %s", p)
 
@@ -81,8 +81,7 @@ class Database:
         return self._migrated
 
     @classmethod
-    @property
-    def migrations_folder(cls):
+    def get_migrations_folder(cls):
         """Root folder path containing the migration SQL scripts."""
 
         return os.path.join(sys.path[1], "filedrop", "migrations")

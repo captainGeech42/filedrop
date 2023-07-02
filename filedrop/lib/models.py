@@ -35,7 +35,7 @@ class User:
         return get_random_bytes(16)
 
     @classmethod
-    def hash_pw(cls, password: str, salt: bytes | None = None) -> tuple[bytes, bytes]:
+    def hash_pw(cls, password: str | bytes, salt: bytes | None = None) -> tuple[bytes, bytes]:
         """Hash the password using scrypt. Returns the (hash, salt)"""
 
         if isinstance(password, str):
@@ -84,7 +84,7 @@ class User:
         del password
 
     def __repr__(self) -> str:
-        return f"<User {self.name}>"
+        return f"<User {self.username}>"
 
     def __str__(self) -> str:
         return repr(self)
