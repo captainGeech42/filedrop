@@ -8,6 +8,7 @@ import filedrop.lib.exc as f_exc
 
 log = logging.getLogger(__name__)
 
+
 @dataclass
 class File:
     """A representation of a file upload from the database."""
@@ -15,6 +16,7 @@ class File:
     name: str
     path: str
     size: int
+
 
 @dataclass
 class User:
@@ -69,32 +71,32 @@ class User:
 
         if not self.password_hash is not None and self.salt is not None:
             raise f_exc.InvalidState(f"Can't check the password, don't have valid params for {self}")
-        
+
         (h, _) = self.hash_pw(password, self.salt)
         del password
 
         return h == self.password_hash
-    
+
     def update_password(self, password: str):
         """Replace the hash+salt for the new password."""
 
         (self.password_hash, self.salt) = self.hash_pw(password)
         del password
-    
+
     def __repr__(self) -> str:
         return f"<User {self.name}>"
-    
+
     def __str__(self) -> str:
         return repr(self)
-    
+
     def __eq__(self, rhs) -> bool:
         if not isinstance(rhs, User):
             return False
-        
+
         return (
-            self.username == rhs.username and
-            self.password_hash == rhs.password_hash and
-            self.salt == rhs.salt and
-            self.enabled == rhs.enabled and
-            self.is_anon == rhs.is_anon
+            self.username == rhs.username
+            and self.password_hash == rhs.password_hash
+            and self.salt == rhs.salt
+            and self.enabled == rhs.enabled
+            and self.is_anon == rhs.is_anon
         )

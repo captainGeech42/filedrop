@@ -4,8 +4,8 @@ import unittest
 import filedrop.lib.database as f_db
 import filedrop.lib.models as f_models
 
-class DatabaseTest(unittest.TestCase):
 
+class DatabaseTest(unittest.TestCase):
     def test_migrations(self):
         num_migrations = len(list(filter(lambda x: x.endswith(".sql"), os.listdir(f_db.Database.migrations_folder))))
 

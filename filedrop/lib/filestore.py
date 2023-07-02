@@ -2,7 +2,8 @@
 Manager for an on-disk filestore
 """
 
-DEFAULT_MAX_SIZE = 10 * 1024 * 1024 * 1024 # 10gb
+DEFAULT_MAX_SIZE = 10 * 1024 * 1024 * 1024  # 10gb
+
 
 class Filestore:
     def __init__(self, db, root_path: str, max_size: int = DEFAULT_MAX_SIZE):

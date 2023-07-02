@@ -2,8 +2,8 @@ import unittest
 
 import filedrop.lib.models as f_models
 
-class UserTest(unittest.TestCase):
 
+class UserTest(unittest.TestCase):
     def test_user(self):
         u1 = f_models.User.new("user1", "hunter2")
         self.assertIsNotNone(u1)
