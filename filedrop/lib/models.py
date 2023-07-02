@@ -9,7 +9,17 @@ import filedrop.lib.exc as f_exc
 log = logging.getLogger(__name__)
 
 @dataclass
+class File:
+    """A representation of a file upload from the database."""
+
+    name: str
+    path: str
+    size: int
+
+@dataclass
 class User:
+    """A representation of a user from the database."""
+
     username: str
     password_hash: bytes | None = None
     salt: bytes | None = None

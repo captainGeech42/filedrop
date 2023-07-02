@@ -2,7 +2,7 @@ import os
 import unittest
 
 import filedrop.lib.database as f_db
-import filedrop.lib.user as f_user
+import filedrop.lib.models as f_models
 
 class DatabaseTest(unittest.TestCase):
 
@@ -29,7 +29,7 @@ class DatabaseTest(unittest.TestCase):
             u = db.get_user("asdfasdf")
             self.assertIsNone(u)
 
-            u2 = f_user.User.new("hello", "world")
+            u2 = f_models.User.new("hello", "world")
             self.assertIsNotNone(u2)
             self.assertTrue(db.add_user(u2))
             self.assertFalse(db.add_user(u2))

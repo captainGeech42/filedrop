@@ -9,7 +9,7 @@ import sqlite3
 import sys
 
 import filedrop.lib.exc as f_exc
-import filedrop.lib.user as f_user
+import filedrop.lib.models as f_models
 
 log = logging.getLogger(__name__)
 
@@ -100,7 +100,7 @@ class Database:
             self._conn.commit()
             c.close()
 
-    def get_user(self, username: str) -> f_user.User | None:
+    def get_user(self, username: str) -> f_models.User | None:
         """Get a user by username from the database, or None if the user does not exist."""
 
         with self.cursor() as c:
@@ -108,11 +108,11 @@ class Database:
             r = x.fetchone()
 
             if r:
-                return f_user.User(username, r[0], r[1], bool(r[2]), bool(r[3]))
+                return f_models.User(username, r[0], r[1], bool(r[2]), bool(r[3]))
             else:
                 return None
             
-    def add_user(self, user: f_user.User) -> bool:
+    def add_user(self, user: f_models.User) -> bool:
         """Add a new user to the database. Returns False on failure or duplicate username, else True."""
 
         with self.cursor() as c:
@@ -123,7 +123,7 @@ class Database:
                 log.debug("duplicate username, can't add to database: %s", user.username)
                 return False
             
-    def update_user_pw(self, user: f_user.User) -> bool:
+    def update_user_pw(self, user: f_models.User) -> bool:
         """Update the hash and salt fields for the specified user. Returns False on failure or no user found, else True."""
 
         with self.cursor() as c:
