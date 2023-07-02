@@ -7,7 +7,9 @@ import filedrop.lib.models as f_models
 
 class DatabaseTest(unittest.TestCase):
     def test_migrations(self):
-        num_migrations = len(list(filter(lambda x: x.endswith(".sql"), os.listdir(f_db.Database.get_migrations_folder()))))
+        num_migrations = len(
+            list(filter(lambda x: x.endswith(".sql"), os.listdir(f_db.Database.get_migrations_folder())))
+        )
 
         with f_db.Database() as db:
             self.assertTrue(db.migrated)

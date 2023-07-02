@@ -4,7 +4,7 @@ Possible exceptions that can be raised by filedrop.
 
 
 class FiledropException(Exception):
-    pass
+    """Base exception for all filedrop exceptions"""
 
 
 class InvalidState(FiledropException):

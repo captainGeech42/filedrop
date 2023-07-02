@@ -1,2 +1,16 @@
 [tool.black]
 line-length = 120
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = false
+warn_unused_configs = true
+files = "filedrop/**/*.py"
+check_untyped_defs = true
+
+[tool.pylint]
+disable = [
+    "line-too-long",
+    "invalid-name",
+    "missing-module-docstring"
+]

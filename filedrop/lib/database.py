@@ -1,7 +1,3 @@
-"""
-Manager for the local database that handles audit data and file metadata.
-"""
-
 import contextlib
 import logging
 import os
@@ -15,6 +11,8 @@ log = logging.getLogger(__name__)
 
 
 class Database:
+    """Manager for the local database that handles auth, audit data and file metadata."""
+
     def __init__(self, path=":memory:"):
         self._path = path
 
@@ -50,7 +48,7 @@ class Database:
 
                 log.debug("executing migration script: %s", p)
 
-                with open(p, "r") as f:
+                with open(p, "r", encoding="utf-8") as f:
                     sql = f.read()
                     try:
                         c.executescript(sql)
@@ -78,6 +76,7 @@ class Database:
 
     @property
     def migrated(self):
+        """Have the model migrations executed?"""
         return self._migrated
 
     @classmethod
@@ -112,8 +111,8 @@ class Database:
 
             if r:
                 return f_models.User(username, r[0], r[1], bool(r[2]), bool(r[3]))
-            else:
-                return None
+
+            return None
 
     def add_user(self, user: f_models.User) -> bool:
         """Add a new user to the database. Returns False on failure or duplicate username, else True."""
