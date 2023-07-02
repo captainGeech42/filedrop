@@ -1,0 +1,42 @@
+name: run linters
+
+on: 
+  push:
+    # don't run when a new tag is pushed
+    # https://github.community/t/dont-run-on-tag-creation/137469/2
+    tags-ignore:
+      - "**"
+    branches:
+      - "**"
+    paths:
+      - "filedrop"
+      - "pyproject.toml"
+  pull_request:
+    paths:
+      - "filedrop"
+      - "pyproject.toml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout code
+      uses: actions/checkout@master
+
+    - name: set up python 3.11
+      uses: actions/setup-python@v1
+      with:
+        python-version: "3.11"
+    
+    - name: install dependencies
+      run: python -m pip install -r requirements-dev.txt
+
+    - name: run mypy
+      run: mypy
+
+    - name: run black
+      run: black -q --check .
+
+    - name: run pylint
+      run: pylint filedrop
