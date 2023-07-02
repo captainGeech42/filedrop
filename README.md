@@ -3,7 +3,7 @@ File sharing website
 
 ## Dev
 
-todo: git hook and ci verify
+todo: git precommit hook
 
 ```
 $ mypy
