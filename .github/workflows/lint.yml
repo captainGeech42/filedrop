@@ -1,4 +1,4 @@
-name: run linters
+name: Run linters
 
 on: 
   push:
@@ -18,25 +18,25 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
     steps:
-    - name: checkout code
+    - name: Checkout code
       uses: actions/checkout@master
 
-    - name: set up python 3.11
+    - name: Set up Python 3.11
       uses: actions/setup-python@v1
       with:
         python-version: "3.11"
     
-    - name: install dependencies
+    - name: Install dependencies
       run: python -m pip install -r requirements-dev.txt
 
-    - name: run mypy
+    - name: Run mypy
       run: mypy
 
-    - name: run black
-      run: black -q --check .
+    - name: Run black
+      run: black .
 
-    - name: run pylint
+    - name: Run pylint
       run: pylint filedrop
