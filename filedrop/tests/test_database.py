@@ -24,7 +24,6 @@ class DatabaseTest(unittest.TestCase):
 
     def test_users(self):
         with f_db.Database() as db:
-
             u = db.get_user("anonymous")
             self.assertIsNotNone(u)
 
