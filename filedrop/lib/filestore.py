@@ -22,6 +22,12 @@ class Filestore:
 
         # TODO lock the dir and clean it up on destroy
 
+    @property
+    def root_path(self) -> str:
+        """Get the root path of the filestore."""
+
+        return self._root_path
+
     def _hash_bytes(self, bytz: bytes) -> str:
         """Get the hash of the provided bytes"""
 
@@ -96,6 +102,13 @@ class Filestore:
         if not anon_upload and username is None:
             raise f_exc.BadArgs("non-anon upload but no username specified")
 
+        # check size
+        sz = len(bytz)
+        if sz > self._max_size:
+            raise f_exc.FileTooLarge(
+                f"can't upload file {name}, too big! max is {self._max_size} bytes, this file is {sz} bytes"
+            )
+
         # get the username
         if username is None:
             # doing an anonymous file upload, set the username
@@ -114,7 +127,7 @@ class Filestore:
         f = f_models.File(
             name=name,
             path=p,
-            size=len(bytz),
+            size=sz,
             hash=h,
             user_id=uid,
             expiration_time=expiration_time,

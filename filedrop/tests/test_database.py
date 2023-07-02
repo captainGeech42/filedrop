@@ -48,3 +48,7 @@ class DatabaseTest(f_tests.FiledropTest):
 
             self.assertIsNotNone(db.get_user_id("anonymous"))
             self.assertIsNone(db.get_user_id("zzxxxcvc"))
+
+    def test_files(self):
+        # TODO
+        pass

@@ -21,3 +21,7 @@ class BadArgs(FiledropException):
 
 class InvalidUser(FiledropException):
     """The user is invalid."""
+
+
+class FileTooLarge(FiledropException):
+    """The size of the file was too large to handle for the current configuration."""
