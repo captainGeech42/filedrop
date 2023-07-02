@@ -9,11 +9,11 @@ on:
     branches:
       - "**"
     paths:
-      - "filedrop"
+      - "filedrop/**/*"
       - "pyproject.toml"
   pull_request:
     paths:
-      - "filedrop"
+      - "filedrop/**/*"
       - "pyproject.toml"
   workflow_dispatch:
 
