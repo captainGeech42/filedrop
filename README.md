@@ -13,5 +13,5 @@ $ python -m pytest filedrop/tests
 ```
 
 ```
-$ ln -s hooks/pre-commit .git/hooks/pre-commit
+$ ln -s $(pwd)hooks/pre-commit .git/hooks/pre-commit
 ```
