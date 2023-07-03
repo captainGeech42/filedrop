@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS `files` (
     user INTEGER NOT NULL,
     expiration_time TIMESTAMP,
     max_downloads INTEGER,
+    num_downloads INTEGER NOT NULL DEFAULT 0,
 
     FOREIGN KEY(user) REFERENCES users(id)
 );

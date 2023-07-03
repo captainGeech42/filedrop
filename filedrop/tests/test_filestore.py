@@ -1,5 +1,7 @@
 import hashlib
 import os
+import time
+from datetime import datetime
 
 import filedrop.lib.exc as f_exc
 import filedrop.lib.models as f_models
@@ -58,3 +60,28 @@ class FilestoreTests(f_utils.FiledropTest):
                 with db.cursor() as c:
                     x = c.execute("SELECT COUNT(*) from FILES;")
                     self.assertEqual(x.fetchone()[0], 0)
+
+    def test_getting(self):
+        bytz = b"hello there. general kenobi!"
+        name = "script.txt"
+
+        with self.getTestDatabase() as db:
+            u1 = f_models.User.new("user1", "hunter2")
+            db.add_user(u1)
+
+            with self.getTestFilestore(db=db) as fs:
+                f1 = fs.save_file(name, bytz, username="user1")
+                self.assertIsNotNone(f1)
+
+                self.assertEqual(fs.get_file_bytes(f1.uuid), bytz)
+                self.assertEqual(fs.get_file_bytes(f1.uuid), bytz)
+
+                f2 = fs.save_file(name, bytz, username="user1", expiration_time=datetime.now())
+                self.assertIsNotNone(f2)
+                time.sleep(1)
+                self.assertIsNone(fs.get_file_bytes(f2.uuid))
+
+                f3 = fs.save_file(name, bytz, username="user1", max_downloads=1)
+                self.assertIsNotNone(f3)
+                self.assertEqual(fs.get_file_bytes(f3.uuid), bytz)
+                self.assertIsNone(fs.get_file_bytes(f3.uuid))

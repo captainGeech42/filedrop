@@ -214,9 +214,20 @@ class Database:
                     file_hash=r[2],
                     path=r[3],
                     username=r[4],
-                    expiration_time=self._timestamp_to_datetime(r[5]),
+                    expiration_time=self._timestamp_to_datetime(r[5]) if r[5] else None,
                     max_downloads=r[6],
                     uploaded_at=self._timestamp_to_datetime(r[7]),
                 )
 
             return None
+
+    def inc_download_count(self, uuid: bytes) -> bool:
+        """Increment the download count for a file. Returns True if the download count was incremented and the file is still under the quota"""
+
+        with self.cursor() as c:
+            x = c.execute(
+                "UPDATE files SET num_downloads = num_downloads + 1 WHERE uuid = ? AND (num_downloads < max_downloads OR max_downloads IS NULL);",
+                (uuid,),
+            )
+
+            return x.rowcount == 1

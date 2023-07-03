@@ -64,3 +64,13 @@ class DatabaseTest(f_tests.FiledropTest):
 
             self.assertIsNone(f.uploaded_at)
             self.assertIsNotNone(f2.uploaded_at)
+
+            f3 = f_models.File.new("hi", "/asdf", 8, "aaaaaaaaaaaaaaaaa", "user1", max_downloads=1)
+            db.add_new_file(f3)
+            f4 = f_models.File.new("hi", "/asdf", 8, "aaaaaaaaaaaaaaaaa", "user1")
+            db.add_new_file(f4)
+            self.assertTrue(db.inc_download_count(f3.uuid))
+            self.assertFalse(db.inc_download_count(f3.uuid))
+            self.assertTrue(db.inc_download_count(f4.uuid))
+            self.assertTrue(db.inc_download_count(f4.uuid))
+            self.assertTrue(db.inc_download_count(f4.uuid))

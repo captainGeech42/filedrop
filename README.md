@@ -3,14 +3,17 @@ File sharing website
 
 ## Dev
 
+Lint:
 ```
-$ mypy
-$ black .
-$ pylint filedrop
+$ mypy; black .; pylint filedrop
+```
+
+Test:
+```
 $ python -m pytest filedrop/tests
 ```
 
-use the hook to auto lint, `black` changes will be written to disk but not staged. still need to manually run tests
+Use the hook to auto lint, `black` changes will be written to disk but not staged. Still need to manually run tests, though.
 ```
 $ ln -s $(pwd)hooks/pre-commit .git/hooks/pre-commit
 ```
