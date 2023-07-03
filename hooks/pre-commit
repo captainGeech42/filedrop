@@ -35,7 +35,7 @@ def run_mypy(files: list[str]) -> bool:
 def run_black(files: list[str]) -> bool:
     """Run black on the changed files"""
 
-    (ret, stdout) = run(["black", "--check"] + files)
+    (ret, stdout) = run(["black"] + files)
 
     if ret != 0:
         print("==== PRECOMMIT FAILURE - black")
