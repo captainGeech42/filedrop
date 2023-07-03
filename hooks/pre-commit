@@ -61,6 +61,8 @@ def run_pylint(files: list[str]) -> bool:
 def main():
     """hook entrypoint"""
 
+    print("==== running precommit")
+
     files = get_changed_files()
     pyfiles = list(filter(lambda x: x.endswith(".py"), files))
 
@@ -69,6 +71,8 @@ def main():
     for f in actions:
         if not f(pyfiles):
             return 1
+
+    print("==== precommit successful")
 
     return 0
 
