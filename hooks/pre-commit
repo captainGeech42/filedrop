@@ -49,7 +49,7 @@ def run_pylint(files: list[str]) -> bool:
     """Run pylint on the changed files"""
 
     # don't run pylint on test files
-    files = list(filter(lambda x: not x.startswith("filedrop/tests/")))
+    files = list(filter(lambda x: not x.startswith("filedrop/tests/"), files))
     if len(files) == 0:
         return True
 
