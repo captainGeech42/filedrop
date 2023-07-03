@@ -58,4 +58,4 @@ CREATE TABLE IF NOT EXISTS `log` (
 ---------
 
 INSERT INTO `migrations` (migration_number) VALUES (0);
-INSERT INTO `users` (uuid, username, is_anon) VALUES (UNHEX("f37c170e59244480a8b42e03c0cb81bb"), "anonymous", TRUE);
+INSERT INTO `users` (uuid, username, is_anon) VALUES (X'f37c170e59244480a8b42e03c0cb81bb', 'anonymous', TRUE);
