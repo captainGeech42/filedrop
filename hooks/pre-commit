@@ -1,0 +1,77 @@
+#!/usr/bin/env python
+
+import subprocess
+import sys
+
+
+def run(cmd: list[str], timeout=10) -> tuple[int, str]:
+    """Run a shell command, returning the output and status code"""
+
+    p = subprocess.run(cmd, timeout=timeout, text=True, check=False)
+
+    return (p.returncode, p.stdout)
+
+
+def get_changed_files() -> list[str]:
+    """Get the list of files being modified in this commit"""
+
+    (_, stdout) = run(["git", "diff-index", "--name-only", "--cached", "HEAD"])
+    return stdout.split("\n")
+
+
+def run_mypy(files: list[str]) -> bool:
+    """Run mypy on the changed files"""
+
+    (ret, stdout) = run(["mypy"] + files)
+
+    if ret != 0:
+        print("==== PRECOMMIT FAILURE - mypy")
+        print(stdout)
+        return False
+
+    return True
+
+
+def run_black(files: list[str]) -> bool:
+    """Run black on the changed files"""
+
+    (ret, stdout) = run(["black", "--check"] + files)
+
+    if ret != 0:
+        print("==== PRECOMMIT FAILURE - black")
+        print(stdout)
+        return False
+
+    return True
+
+
+def run_pylint(files: list[str]) -> bool:
+    """Run pylint on the changed files"""
+
+    (ret, stdout) = run(["pylint", "-j", "0"] + files)
+
+    if ret != 0:
+        print("==== PRECOMMIT FAILURE - pylint")
+        print(stdout)
+        return False
+
+    return True
+
+
+def main():
+    """hook entrypoint"""
+
+    files = get_changed_files()
+    pyfiles = list(filter(lambda x: x.endswith(".py"), files))
+
+    actions = [run_mypy, run_black, run_pylint]
+
+    for f in actions:
+        if not f(pyfiles):
+            return 1
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
