@@ -73,15 +73,22 @@ class FilestoreTests(f_utils.FiledropTest):
                 f1 = fs.save_file(name, bytz, username="user1")
                 self.assertIsNotNone(f1)
 
+                # no max download size, make sure we can dl multiple times
                 self.assertEqual(fs.get_file_bytes(f1.uuid), bytz)
                 self.assertEqual(fs.get_file_bytes(f1.uuid), bytz)
 
+                # make sure file expires properly
                 f2 = fs.save_file(name, bytz, username="user1", expiration_time=datetime.now())
                 self.assertIsNotNone(f2)
                 time.sleep(1)
                 self.assertIsNone(fs.get_file_bytes(f2.uuid))
 
+                # make sure file maxes out properly
                 f3 = fs.save_file(name, bytz, username="user1", max_downloads=1)
                 self.assertIsNotNone(f3)
                 self.assertEqual(fs.get_file_bytes(f3.uuid), bytz)
                 self.assertIsNone(fs.get_file_bytes(f3.uuid))
+
+                # make sure we can bypass the limits if needed
+                self.assertIsNotNone(fs.get_file_bytes(f2.uuid, validate_conditions=False))
+                self.assertIsNotNone(fs.get_file_bytes(f3.uuid, validate_conditions=False))
