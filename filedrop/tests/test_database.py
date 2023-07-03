@@ -6,7 +6,7 @@ import filedrop.lib.models as f_models
 import filedrop.tests.utils as f_tests
 
 
-class DatabaseTest(f_tests.FiledropTest):
+class DatabaseTests(f_tests.FiledropTest):
     def test_migrations(self):
         num_migrations = len(
             list(filter(lambda x: x.endswith(".sql"), os.listdir(f_db.Database.get_migrations_folder())))

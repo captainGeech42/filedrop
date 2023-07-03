@@ -13,7 +13,8 @@ disable = [
     "line-too-long",
     "missing-module-docstring",
     "fixme",
-    "too-few-public-methods"
+    "too-few-public-methods",
+    "too-many-branches"
 ]
 ignore = [
     "filedrop/tests"
