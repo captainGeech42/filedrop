@@ -38,6 +38,7 @@ class UserTest(f_tests.FiledropTest):
         self.assertIsNotNone(f1)
 
         f1p = f_models.File.new("asdf", "hi", 8, "aaaaaaaaaaaaaa", "user1", expiration_time=ts, max_downloads=5)
+        f1p = f_models.File.new("asdf", "hi", 8, "aaaaaaaaaaaaaa", "user1", expiration_time=ts, max_downloads=5)
         self.assertNotEqual(f1.uuid, f1p.uuid)
         self.assertNotEqual(f1, f1p)
 

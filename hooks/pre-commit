@@ -48,6 +48,11 @@ def run_black(files: list[str]) -> bool:
 def run_pylint(files: list[str]) -> bool:
     """Run pylint on the changed files"""
 
+    # don't run pylint on test files
+    files = list(filter(lambda x: not x.startswith("filedrop/tests/")))
+    if len(files) == 0:
+        return True
+
     (ret, stdout) = run(["pylint", "-j", "0"] + files)
 
     if ret != 0:
