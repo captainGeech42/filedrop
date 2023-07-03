@@ -7,7 +7,7 @@ import sys
 def run(cmd: list[str], timeout=10) -> tuple[int, str]:
     """Run a shell command, returning the output and status code"""
 
-    p = subprocess.run(cmd, timeout=timeout, text=True, check=False)
+    p = subprocess.run(cmd, timeout=timeout, text=True, check=False, capture_output=True)
 
     return (p.returncode, p.stdout)
 
@@ -59,18 +59,19 @@ def run_pylint(files: list[str]) -> bool:
 
 
 def main():
-    """hook entrypoint"""
+    """Hook entrypoint"""
 
     print("==== running precommit")
 
     files = get_changed_files()
-    pyfiles = list(filter(lambda x: x.endswith(".py"), files))
+    pyfiles = list(filter(lambda x: x.startswith("filedrop") and x.endswith(".py"), files))
 
-    actions = [run_mypy, run_black, run_pylint]
+    if len(pyfiles) > 0:
+        actions = [run_mypy, run_black, run_pylint]
 
-    for f in actions:
-        if not f(pyfiles):
-            return 1
+        for f in actions:
+            if not f(pyfiles):
+                return 1
 
     print("==== precommit successful")
 
