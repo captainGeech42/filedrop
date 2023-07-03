@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS `migrations` (
 CREATE TABLE IF NOT EXISTS `users` (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    uuid BLOB UNIQUE NOT NULL,
     username TEXT UNIQUE NOT NULL,
     password_hash BLOB,
     salt BLOB,
@@ -17,6 +18,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 CREATE TABLE IF NOT EXISTS `apikeys` (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    uuid BLOB UNIQUE NOT NULL,
     user INTEGER NOT NULL,
     key TEXT NOT NULL,
     deleted INTEGER DEFAULT FALSE,
@@ -27,6 +29,7 @@ CREATE TABLE IF NOT EXISTS `apikeys` (
 CREATE TABLE IF NOT EXISTS `files` (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    uuid BLOB UNIQUE NOT NULL,
     name TEXT NOT NULL,
     size INTEGER NOT NULL,
     hash TEXT NOT NULL,
@@ -54,4 +57,4 @@ CREATE TABLE IF NOT EXISTS `log` (
 ---------
 
 INSERT INTO `migrations` (migration_number) VALUES (0);
-INSERT INTO `users` (username, is_anon) VALUES ("anonymous", TRUE);
+INSERT INTO `users` (uuid, username, is_anon) VALUES (UNHEX("f37c170e59244480a8b42e03c0cb81bb"), "anonymous", TRUE);

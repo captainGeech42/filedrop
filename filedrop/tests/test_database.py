@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 import filedrop.lib.database as f_db
 import filedrop.lib.models as f_models
@@ -50,5 +51,16 @@ class DatabaseTest(f_tests.FiledropTest):
             self.assertIsNone(db.get_user_id("zzxxxcvc"))
 
     def test_files(self):
-        # TODO
-        pass
+        with self.getTestDatabase() as db:
+            u = f_models.User.new("user1", "pass2")
+            db.add_user(u)
+
+            ts = datetime.now()
+
+            f = f_models.File.new("hi", "/asdf", 8, "aaaaaaaaaaaaaaaaa", "user1", expiration_time=ts, max_downloads=5)
+            db.add_new_file(f)
+            f2 = db.get_file(f.uuid)
+            self.assertEqual(f, f2)
+
+            self.assertIsNone(f.uploaded_at)
+            self.assertIsNotNone(f2.uploaded_at)

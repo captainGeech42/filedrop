@@ -2,6 +2,7 @@ import contextlib
 import logging
 import os
 import sqlite3
+from datetime import datetime
 
 from filedrop import ROOT_DIR
 import filedrop.lib.exc as f_exc
@@ -70,6 +71,18 @@ class Database:
         self._conn.close()
         self._conn = None
 
+    @classmethod
+    def _timestamp_to_datetime(cls, val: str) -> datetime:
+        """Convert a TIMESTAMP SQLite value to a Python datetime object."""
+
+        # auto generated timestamps in the db are second precision
+        # datetime objects have ms precision
+        fstr = "%Y-%m-%d %H:%M:%S"
+        if "." in val:
+            fstr += ".%f"
+
+        return datetime.strptime(val, fstr)
+
     def __enter__(self):
         return self
 
@@ -79,6 +92,7 @@ class Database:
     @property
     def migrated(self):
         """Have the model migrations executed?"""
+
         return self._migrated
 
     @classmethod
@@ -106,13 +120,15 @@ class Database:
 
         with self.cursor() as c:
             x = c.execute(
-                "SELECT password_hash, salt, enabled, is_anon FROM users WHERE username = ?;",
+                "SELECT uuid, password_hash, salt, enabled, is_anon FROM users WHERE username = ?;",
                 (username,),
             )
             r = x.fetchone()
 
             if r:
-                return f_models.User(username, r[0], r[1], bool(r[2]), bool(r[3]))
+                return f_models.User(
+                    uuid=r[0], username=username, password_hash=r[1], salt=r[2], enabled=bool(r[3]), is_anon=bool(r[4])
+                )
 
             return None
 
@@ -137,8 +153,8 @@ class Database:
         with self.cursor() as c:
             try:
                 x = c.execute(
-                    "INSERT INTO users (username, password_hash, salt, enabled) VALUES (?, ?, ?, ?);",
-                    (user.username, user.password_hash, user.salt, user.enabled),
+                    "INSERT INTO users (uuid, username, password_hash, salt, enabled) VALUES (?, ?, ?, ?, ?);",
+                    (user.uuid, user.username, user.password_hash, user.salt, user.enabled),
                 )
                 return x.rowcount == 1
             except sqlite3.IntegrityError:
@@ -165,7 +181,42 @@ class Database:
 
         with self.cursor() as c:
             x = c.execute(
-                "INSERT INTO files (name, size, hash, path, user, expiration_time, max_downloads) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (file.name, file.size, file.hash, file.path, file.user_id, file.expiration_time, file.max_downloads),
+                "INSERT INTO files (uuid, name, size, hash, path, user, expiration_time, max_downloads) VALUES (?, ?, ?, ?, ?, (SELECT id FROM users WHERE username = ?), ?, ?)",
+                (
+                    file.uuid,
+                    file.name,
+                    file.size,
+                    file.file_hash,
+                    file.path,
+                    file.username,
+                    file.expiration_time,
+                    file.max_downloads,
+                ),
             )
             return x.rowcount == 1
+
+    def get_file(self, uuid: bytes) -> f_models.File | None:
+        """Get a file by it's UUID, or None if it doesn't exist."""
+
+        with self.cursor() as c:
+            x = c.execute(
+                "SELECT name, size, hash, path, users.username, expiration_time, max_downloads, files.created_at FROM files JOIN users ON files.user = users.id WHERE files.uuid = ?;",
+                (uuid,),
+            )
+
+            r = x.fetchone()
+
+            if r:
+                return f_models.File(
+                    uuid=uuid,
+                    name=r[0],
+                    size=r[1],
+                    file_hash=r[2],
+                    path=r[3],
+                    username=r[4],
+                    expiration_time=self._timestamp_to_datetime(r[5]),
+                    max_downloads=r[6],
+                    uploaded_at=self._timestamp_to_datetime(r[7]),
+                )
+
+            return None

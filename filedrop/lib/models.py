@@ -6,6 +6,7 @@ from datetime import datetime
 from Crypto.Random import get_random_bytes
 
 import filedrop.lib.exc as f_exc
+import filedrop.lib.utils as f_utils
 
 log = logging.getLogger(__name__)
 
@@ -14,6 +15,7 @@ log = logging.getLogger(__name__)
 class User:
     """A representation of a user from the database."""
 
+    uuid: bytes
     username: str
     password_hash: bytes | None = None
     salt: bytes | None = None
@@ -52,7 +54,7 @@ class User:
         (h, salt) = User.hash_pw(password)
         del password
 
-        return User(username, h, salt)
+        return User(uuid=f_utils.gen_uuid(), username=username, password_hash=h, salt=salt)
 
     def check_password(self, password: str) -> bool:
         """Check if the provided password is valid for this user"""
@@ -81,33 +83,64 @@ class User:
     def __str__(self) -> str:
         return repr(self)
 
-    def __eq__(self, rhs) -> bool:
-        if not isinstance(rhs, User):
-            return False
-
-        return (
-            self.username == rhs.username
-            and self.password_hash == rhs.password_hash
-            and self.salt == rhs.salt
-            and self.enabled == rhs.enabled
-            and self.is_anon == rhs.is_anon
-        )
-
 
 @dataclass
 class File:
     """A representation of a file upload from the database."""
 
+    uuid: bytes
     name: str
     path: str
     size: int
-    hash: str
-    user_id: int
+    file_hash: str
+    username: str
     expiration_time: datetime | None = None
     max_downloads: int | None = None
+    uploaded_at: datetime | None = None
+
+    # pylint: disable-next=too-many-arguments
+    @staticmethod
+    def new(
+        name: str,
+        path: str,
+        size: int,
+        file_hash: str,
+        username: str,
+        expiration_time: datetime | None = None,
+        max_downloads: int | None = None,
+        uploaded_at: datetime | None = None,
+    ) -> "File":
+        """Generate a new File object"""
+
+        return File(
+            uuid=f_utils.gen_uuid(),
+            name=name,
+            path=path,
+            size=size,
+            file_hash=file_hash,
+            username=username,
+            expiration_time=expiration_time,
+            max_downloads=max_downloads,
+            uploaded_at=uploaded_at,
+        )
 
     def __repr__(self) -> str:
-        return f"<File {self.name} [{self.hash[:8]}...{self.hash[-8:]}, {self.size} bytes] - user {self.user_id}>"
+        return f"<File {self.name} [{self.file_hash[:8]}...{self.file_hash[-8:]}, {self.size} bytes] - user {self.username}>"
 
     def __str__(self) -> str:
         return repr(self)
+
+    def __eq__(self, rhs) -> bool:
+        if not isinstance(rhs, File):
+            return False
+
+        return (
+            self.uuid == rhs.uuid
+            and self.name == rhs.name
+            and self.path == rhs.path
+            and self.size == rhs.size
+            and self.file_hash == rhs.file_hash
+            and self.username == rhs.username
+            and self.expiration_time == rhs.expiration_time
+            and self.max_downloads == rhs.max_downloads
+        )

@@ -124,12 +124,12 @@ class Filestore:
         if not self._write_bytes(p, bytz):
             return None
 
-        f = f_models.File(
+        f = f_models.File.new(
             name=name,
             path=p,
             size=sz,
-            hash=h,
-            user_id=uid,
+            file_hash=h,
+            username=username,
             expiration_time=expiration_time,
             max_downloads=max_downloads,
         )

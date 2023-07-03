@@ -41,7 +41,6 @@ class FilestoreTests(f_utils.FiledropTest):
 
     def test_bad_add(self):
         bytz = b"hello there. general kenobi!"
-        fhash = hashlib.sha256(bytz).hexdigest()
         name = "script.txt"
 
         with self.getTestDatabase() as db:

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import filedrop.lib.models as f_models
 import filedrop.tests.utils as f_tests
 
@@ -30,4 +32,14 @@ class UserTest(f_tests.FiledropTest):
         self.assertTrue(u2.check_password("zxcv"))
 
     def test_file(self):
-        pass
+        ts = datetime.now()
+
+        f1 = f_models.File.new("asdf", "hi", 8, "aaaaaaaaaaaaaa", "user1", expiration_time=ts, max_downloads=5)
+        self.assertIsNotNone(f1)
+
+        f1p = f_models.File.new("asdf", "hi", 8, "aaaaaaaaaaaaaa", "user1", expiration_time=ts, max_downloads=5)
+        self.assertNotEqual(f1.uuid, f1p.uuid)
+        self.assertNotEqual(f1, f1p)
+
+        f1p.uuid = f1.uuid
+        self.assertEqual(f1, f1p)
