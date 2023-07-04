@@ -14,7 +14,9 @@ disable = [
     "missing-module-docstring",
     "fixme",
     "too-few-public-methods",
-    "too-many-branches"
+    "too-many-branches",
+    "too-many-arguments",
+    "too-many-instance-attributes"
 ]
 ignore = [
     "filedrop/tests"

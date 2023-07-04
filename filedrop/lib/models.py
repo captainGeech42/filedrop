@@ -85,7 +85,6 @@ class User:
 
 
 @dataclass
-# pylint: disable-next=too-many-instance-attributes
 class File:
     """A representation of a file upload from the database."""
 
@@ -100,7 +99,6 @@ class File:
     uploaded_at: datetime | None = None
 
     @staticmethod
-    # pylint: disable-next=too-many-arguments
     def new(
         name: str,
         path: str,

@@ -5,6 +5,7 @@ from datetime import datetime
 
 import filedrop.lib.exc as f_exc
 import filedrop.lib.models as f_models
+import filedrop.lib.time as f_time
 import filedrop.tests.utils as f_utils
 
 
@@ -78,7 +79,7 @@ class FilestoreTests(f_utils.FiledropTest):
                 self.assertEqual(fs.get_file_bytes(f1.uuid), bytz)
 
                 # make sure file expires properly
-                f2 = fs.save_file(name, bytz, username="user1", expiration_time=datetime.now())
+                f2 = fs.save_file(name, bytz, username="user1", expiration_time=f_time.now())
                 self.assertIsNotNone(f2)
                 time.sleep(1)
                 self.assertIsNone(fs.get_file_bytes(f2.uuid))

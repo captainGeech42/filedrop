@@ -7,6 +7,7 @@ from datetime import datetime
 from filedrop import ROOT_DIR
 import filedrop.lib.exc as f_exc
 import filedrop.lib.models as f_models
+import filedrop.lib.time as f_time
 
 log = logging.getLogger(__name__)
 
@@ -61,7 +62,7 @@ class Database:
         log.info("finished database migrations")
         self._migrated = True
 
-    def _close(self):
+    def close(self):
         """Close the database connection"""
 
         if self._conn is None:
@@ -71,23 +72,11 @@ class Database:
         self._conn.close()
         self._conn = None
 
-    @classmethod
-    def _timestamp_to_datetime(cls, val: str) -> datetime:
-        """Convert a TIMESTAMP SQLite value to a Python datetime object."""
-
-        # auto generated timestamps in the db are second precision
-        # datetime objects have ms precision
-        fstr = "%Y-%m-%d %H:%M:%S"
-        if "." in val:
-            fstr += ".%f"
-
-        return datetime.strptime(val, fstr)
-
     def __enter__(self):
         return self
 
     def __exit__(self, *args, **kwargs):
-        self._close()
+        self.close()
 
     @property
     def migrated(self):
@@ -176,8 +165,8 @@ class Database:
 
         return self.get_user("anonymous")
 
-    def add_new_file(self, file: f_models.File) -> bool:
-        """Add a new file upload."""
+    def add_new_file(self, file: f_models.File) -> datetime | None:
+        """Add a new file upload. Returns the upload datetime on success, otherwise None"""
 
         with self.cursor() as c:
             x = c.execute(
@@ -193,7 +182,17 @@ class Database:
                     file.max_downloads,
                 ),
             )
-            return x.rowcount == 1
+
+            if x.rowcount == 1:
+                y = c.execute("SELECT created_at FROM files WHERE uuid = ?;", (file.uuid,))
+                r = y.fetchall()
+                if len(r) != 1:
+                    log.error("just uploaded file %s but can't get the created_at value from the database", file)
+                    return None
+
+                return f_time.parse_db_timestamp(r[0][0])
+
+            return None
 
     def get_file(self, uuid: bytes) -> f_models.File | None:
         """Get a file by it's UUID, or None if it doesn't exist."""
@@ -214,9 +213,9 @@ class Database:
                     file_hash=r[2],
                     path=r[3],
                     username=r[4],
-                    expiration_time=self._timestamp_to_datetime(r[5]) if r[5] else None,
+                    expiration_time=f_time.parse_db_timestamp(r[5]) if r[5] else None,
                     max_downloads=r[6],
-                    uploaded_at=self._timestamp_to_datetime(r[7]),
+                    uploaded_at=f_time.parse_db_timestamp(r[7]),
                 )
 
             return None

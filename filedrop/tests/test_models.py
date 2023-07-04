@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import filedrop.lib.models as f_models
+import filedrop.lib.time as f_time
 import filedrop.tests.utils as f_tests
 
 
@@ -32,7 +33,7 @@ class ModelTests(f_tests.FiledropTest):
         self.assertTrue(u2.check_password("zxcv"))
 
     def test_file(self):
-        ts = datetime.now()
+        ts = f_time.now()
 
         f1 = f_models.File.new("asdf", "hi", 8, "aaaaaaaaaaaaaa", "user1", expiration_time=ts, max_downloads=5)
         self.assertIsNotNone(f1)

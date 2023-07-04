@@ -1,8 +1,9 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import filedrop.lib.database as f_db
 import filedrop.lib.models as f_models
+import filedrop.lib.time as f_time
 import filedrop.tests.utils as f_tests
 
 
@@ -55,10 +56,12 @@ class DatabaseTests(f_tests.FiledropTest):
             u = f_models.User.new("user1", "pass2")
             db.add_user(u)
 
-            ts = datetime.now()
+            now = f_time.now()
 
-            f = f_models.File.new("hi", "/asdf", 8, "aaaaaaaaaaaaaaaaa", "user1", expiration_time=ts, max_downloads=5)
-            db.add_new_file(f)
+            f = f_models.File.new("hi", "/asdf", 8, "aaaaaaaaaaaaaaaaa", "user1", expiration_time=now, max_downloads=5)
+            ts = db.add_new_file(f)
+            self.assertTrue(ts >= now - timedelta(seconds=3))
+            self.assertTrue(ts <= now + timedelta(seconds=3))
             f2 = db.get_file(f.uuid)
             self.assertEqual(f, f2)
 

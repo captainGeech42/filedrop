@@ -6,6 +6,7 @@ from datetime import datetime
 import filedrop.lib.database as f_db
 import filedrop.lib.exc as f_exc
 import filedrop.lib.models as f_models
+import filedrop.lib.time as f_time
 import filedrop.lib.utils as f_utils
 
 DEFAULT_MAX_SIZE = 10 * 1024 * 1024 * 1024  # 10gb
@@ -107,7 +108,6 @@ class Filestore:
 
         return None
 
-    # pylint: disable-next=too-many-arguments
     def save_file(
         self,
         name: str,
@@ -118,7 +118,7 @@ class Filestore:
         max_downloads: int | None = None,
     ) -> f_models.File | None:
         """
-        Save a file to disk.
+        Save a file to disk and record the metadata in the database.
 
         If anon_upload is True, username must be None. Otherwise, the username of the uploader must be specified.
         """
@@ -190,7 +190,7 @@ class Filestore:
         if validate_conditions:
             # check expiration
             if f.expiration_time is not None:
-                now = datetime.now()
+                now = f_time.now()
                 if now > f.expiration_time:
                     log.debug("can't download %s, file is expired", f_utils.hexstr(f.uuid))
                     return None

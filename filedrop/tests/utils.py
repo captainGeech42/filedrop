@@ -86,7 +86,7 @@ class ServerTest(FiledropTest):
         cls._fs_ctx = cls.getTestFilestore(db=cls.db)
         cls.fs = cls._fs_ctx.__enter__()
 
-        cls.app = f_srv.create_app()
+        cls.app = f_srv.create_app(testing=True, db=cls.db, fs=cls.fs)
         cls.app.config.update({"TESTING": True})
 
         cls.client = cls.app.test_client()
