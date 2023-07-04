@@ -18,11 +18,11 @@ class FiledropTest(unittest.TestCase):
 
     @classmethod
     @contextlib.contextmanager
-    def getTestDatabase(cls):
+    def getTestDatabase(cls, path=":memory:"):
         """Get a disposable database instance."""
 
         try:
-            with f_db.Database() as db:
+            with f_db.Database(path=path) as db:
                 yield db
         finally:
             pass

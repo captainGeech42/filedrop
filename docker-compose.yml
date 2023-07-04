@@ -3,6 +3,7 @@ version: "3"
 services:
   app:
     build: .
+    # image: captaingeech/filedrop:latest
     ports:
       - "5000:5000"
     volumes:
@@ -10,5 +11,5 @@ services:
       - type: bind
         source: ./filedrop.db
         target: /filedrop.db
-    # environment:
-    #   - FD_DEBUG=yes
+    environment:
+      - FD_DEBUG=yes

@@ -1,5 +1,6 @@
 import os
-from datetime import datetime, timedelta
+import tempfile
+from datetime import timedelta
 
 import filedrop.lib.database as f_db
 import filedrop.lib.models as f_models
@@ -13,16 +14,23 @@ class DatabaseTests(f_tests.FiledropTest):
             list(filter(lambda x: x.endswith(".sql"), os.listdir(f_db.Database.get_migrations_folder())))
         )
 
-        with self.getTestDatabase() as db:
-            self.assertTrue(db.migrated)
+        # ensure the migrations can be executed multiple times against the same db idempotently
+        with tempfile.TemporaryDirectory() as tmpdir:
+            fn = os.path.join(tmpdir, "filedrop.db")
 
-            with db.cursor() as c:
-                x = c.execute("select count(*) from migrations;")
-                self.assertEqual(x.fetchone()[0], num_migrations)
+            with self.getTestDatabase(path=fn) as db:
+                self.assertTrue(db.migrated)
 
-                # migration 000
-                x = c.execute("select count(*) from users where username = 'anonymous' and is_anon = True;")
-                self.assertEqual(x.fetchone()[0], 1)
+            with self.getTestDatabase(path=fn) as db:
+                self.assertTrue(db.migrated)
+
+                with db.cursor() as c:
+                    x = c.execute("select count(*) from migrations;")
+                    self.assertEqual(x.fetchone()[0], num_migrations)
+
+                    # migration 000
+                    x = c.execute("select count(*) from users where username = 'anonymous' and is_anon = True;")
+                    self.assertEqual(x.fetchone()[0], 1)
 
     def test_users(self):
         with self.getTestDatabase() as db:
