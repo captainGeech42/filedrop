@@ -24,13 +24,26 @@ CONFIG = f_config.ConfigLoader(
 )
 
 
-def create_app(testing=False, db: f_db.Database | None = None, fs: f_fs.Filestore | None = None) -> Flask:
-    """Initialize the Flask application."""
+def create_app(
+    testing=False, gunicorn=False, db: f_db.Database | None = None, fs: f_fs.Filestore | None = None
+) -> Flask:
+    """
+    Initialize the Flask application.
+
+    - testing: if True, the config is not loaded and requires a db and fs to be specified
+    - gunicorn: if True, argv is ignored when loading the config
+    - db | fs: use the provided db or fs objects instead of initializing a new one
+    """
 
     # load the config
     if not testing:
-        if not CONFIG.load_config():
+        argv = [] if gunicorn else sys.argv[1:]
+        if not CONFIG.load_config(argv):
             sys.exit(1)
+
+    # configure logging
+    lvl = logging.DEBUG if testing or CONFIG.get_value("debug") else logging.INFO
+    logging.basicConfig(level=lvl)
 
     # init the flask app
     app = Flask(__name__)

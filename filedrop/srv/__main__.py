@@ -1,6 +1,5 @@
-"""import filedrop.srv as f_srv
+import filedrop.srv as f_srv
 
 if __name__ == "__main__":
-    p = f_srv.CONFIG
-    p.parse_args()
-"""
+    app = f_srv.create_app()
+    app.run(host="localhost", port=5000, debug=bool(f_srv.CONFIG.get_value("debug")))

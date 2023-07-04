@@ -153,8 +153,6 @@ class ConfigLoader:
         # handle argv first
         if len(argv) > 0:
             cli_args = self._argparser.parse_args(argv)
-            print(argv)
-            print(cli_args)
             for opt in self._options:
                 v = getattr(cli_args, opt.namespace_key)
                 if v is not None:

@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - "./filestore:/filestore"
+      - type: bind
+        source: ./filedrop.db
+        target: /filedrop.db
+    # environment:
+    #   - FD_DEBUG=yes
